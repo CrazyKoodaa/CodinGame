@@ -100,6 +100,7 @@ class Player
                         +
                         ((lThor.position[1] - lGiant.positions[i + 1, 1]) * (lThor.position[1] - lGiant.positions[i + 1, 1]))
                     );
+                    
                     if (giantDistance > giantDistance2)
                     {
                         int tempX = lGiant.positions[i, 0];
