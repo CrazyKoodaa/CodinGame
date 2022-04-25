@@ -1,0 +1,16 @@
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\obj\Debug\net5.0\CodingGame_SpringChallenge2022.csproj.AssemblyReference.cache
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\obj\Debug\net5.0\CodingGame_SpringChallenge2022.GeneratedMSBuildEditorConfig.editorconfig
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\obj\Debug\net5.0\CodingGame_SpringChallenge2022.AssemblyInfoInputs.cache
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\obj\Debug\net5.0\CodingGame_SpringChallenge2022.AssemblyInfo.cs
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\obj\Debug\net5.0\CodingGame_SpringChallenge2022.csproj.CoreCompileInputs.cache
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\bin\Debug\net5.0\CodingGame_SpringChallenge2022.exe
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\bin\Debug\net5.0\CodingGame_SpringChallenge2022.deps.json
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\bin\Debug\net5.0\CodingGame_SpringChallenge2022.runtimeconfig.json
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\bin\Debug\net5.0\CodingGame_SpringChallenge2022.runtimeconfig.dev.json
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\bin\Debug\net5.0\CodingGame_SpringChallenge2022.dll
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\bin\Debug\net5.0\CodingGame_SpringChallenge2022.pdb
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\obj\Debug\net5.0\CodingGame_SpringChallenge2022.dll
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\obj\Debug\net5.0\refint\CodingGame_SpringChallenge2022.dll
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\obj\Debug\net5.0\CodingGame_SpringChallenge2022.pdb
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\obj\Debug\net5.0\CodingGame_SpringChallenge2022.genruntimeconfig.cache
+C:\shared\Projekte\Programmieren\!github\CodinGame\SpringChallenge2022SpiderGame\CodingGame_SpringChallenge2022\obj\Debug\net5.0\ref\CodingGame_SpringChallenge2022.dll

@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "CodingGame_SpringChallenge2022/1.0.0": {
+        "runtime": {
+          "CodingGame_SpringChallenge2022.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "CodingGame_SpringChallenge2022/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
