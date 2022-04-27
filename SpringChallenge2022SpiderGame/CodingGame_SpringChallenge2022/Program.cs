@@ -39,6 +39,7 @@ class Player
         while (true)
         {
             Entity.countingRounds++;
+            Console.Error.WriteLine($"--->> ROUND {Entity.countingRounds}");
             #region StartWhile
             inputs = Console.ReadLine().Split(' ');
             int myHealth = int.Parse(inputs[0]); // Your base health
@@ -145,7 +146,7 @@ class Player
                         break;
                 }
             }
-            if (Entity.countingRounds > 10) Entity.countingRounds = 0;
+            //if (Entity.countingRounds > 10) Entity.countingRounds = 0;
         }
     }
 }
@@ -171,7 +172,7 @@ internal class Map
     {
         posDefense.Add(myMath.calculateCorrectPositionFrom(HomeBase, new Vector2(7500, 2500)));
         posDefense.Add(myMath.calculateCorrectPositionFrom(HomeBase, new Vector2(4500, 7500)));
-        posDefense.Add(myMath.calculateCorrectPositionFrom(HomeBase, new Vector2(2000, 2000)));
+        posDefense.Add(myMath.calculateCorrectPositionFrom(HomeBase, new Vector2(4500, 3500)));
     }
 
     internal static void setPosMiddle()
@@ -439,9 +440,9 @@ public class Entity
             Entity.shield(myHeroes[0]);
         else
         {
-            if (Entity.countingRounds > 10) Entity.countingShielded = 0;
+            if (Entity.countingRounds % 12 == 0) Entity.countingShielded = 0;
 
-            if (Entity.countingShielded > 1 && nearestOppHero != null)
+            if (Entity.countingShielded > 1 && nearestOppHero != null && nearestOppHero.EntityIsShielded == false)
             {
                 Console.Error.WriteLine("OFFENSE: There are more than 1 correct");
                 Entity.control(nearestOppHero.Id, Map.HomeBase);
