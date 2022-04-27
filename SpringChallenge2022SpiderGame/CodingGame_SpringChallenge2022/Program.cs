@@ -1,272 +1,45 @@
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
+using System.IO;
+using System.Text;
+using System.Collections;
+using System.Collections.Generic;
 using System.Numerics;
 
-// Version = "2.4.1"
-
-class Map
-{
-    public static Vector2 baseLeft = new Vector2(0, 0);
-    public static Vector2 baseRight = new Vector2(17630, 9000);
-
-    public static readonly int radiusDefense = 5000;
-    public static readonly int radiusDefenseBase = 6000;
-    public static readonly int radiusMiddle = 9000;
-    public static readonly int radiusOffense = 14500;
-
-    #region Properties
-    private static Vector2 HomeBase { get; set; }
-    private static Vector2 EnemyBase { get; set; }
-    private static Vector2 OffenseAll { get; set; }
-    private static Vector2 OffenseLeft { get; set; }
-    private static Vector2 OffenseRight { get; set; }
-    private static Vector2 MiddleAll { get; set; }
-    private static Vector2 MiddleLeft { get; set; }
-    private static Vector2 MiddleRight { get; set; }
-    private static Vector2 DefenseAll { get; set; }
-    private static Vector2 DefenseLeft { get; set; }
-    private static Vector2 DefenseRight { get; set; }
-    #endregion
-
-    #region BasePosition
-    public static void SetHomeBasePosition (Vector2 PointHomeBase) => HomeBase = PointHomeBase;
-    public static Vector2 GetHomeBasePosition () => HomeBase;
-
-    public static void SetEnemyBasePosition (Vector2 PointEnemyBase) => EnemyBase = PointEnemyBase;
-    public static Vector2 GetEnemyBasePosition () => EnemyBase;
-    #endregion
-
-    #region OffensePosition
-    public static void SetOffenseAllPosition(Vector2 PointOffenseAll) => OffenseAll = calculateCorrectPositionsFromHome(PointOffenseAll);
-    public static Vector2 GetOffenseAllPosition() => OffenseAll;
-    public static void SetOffenseRightPosition(Vector2 PointOffenseRight) => OffenseRight = calculateCorrectPositionsFromHome(PointOffenseRight);
-    public static Vector2 GetOffenseRightPosition () => OffenseRight;
-    public static void SetOffenseLeftPosition(Vector2 PointOffenseLeft) => OffenseLeft = calculateCorrectPositionsFromHome(PointOffenseLeft);
-    public static Vector2 GetOffenseLeftPosition () => OffenseLeft;
-    #endregion
-
-    #region MiddlePosition
-    public static void SetMiddleLeftPosition(Vector2 PointMiddleLeft) => MiddleLeft = calculateCorrectPositionsFromHome(PointMiddleLeft);
-    public static Vector2 GetMiddleLeftPosition () => MiddleLeft;
-    public static void SetMiddleRightPosition(Vector2 PointMiddleRight) => MiddleRight = calculateCorrectPositionsFromHome(PointMiddleRight);
-    public static Vector2 GetMiddleRightPosition () => MiddleRight;
-    public static void SetMiddleAllPosition (Vector2 PointMiddleAll) => MiddleAll = calculateCorrectPositionsFromHome(PointMiddleAll);
-    public static Vector2 GetMiddleAllPosition () => MiddleAll;
-    #endregion
-
-    #region DefensePosition
-    public static void SetDefenseLeftPosition(Vector2 PointDefenseLeft) => DefenseLeft = calculateCorrectPositionsFromHome(PointDefenseLeft);
-    public static Vector2 GetDefenseLeftPosition () => DefenseLeft;
-    public static void SetDefenseRightPosition(Vector2 PointDefenseRight) => DefenseRight = calculateCorrectPositionsFromHome(PointDefenseRight);
-    public static Vector2 GetDefenseRightPosition() => DefenseRight;
-    public static void SetDefenseAllPosition(Vector2 PointDefenseAll) => DefenseAll = calculateCorrectPositionsFromHome(PointDefenseAll);
-    public static Vector2 GetDefenseAllPosition() => DefenseAll;
-    #endregion
-
-    public static void startSettingProperties(Vector2 homeBasePosition)
-    {
-        setCorrectBasePosition(homeBasePosition); // Setting Home and Enemy Base Position
-
-        SetDefenseLeftPosition(setCorrectPositionOnACircle(radiusDefenseBase, -2000)); //radiusDefense = 3000
-        SetDefenseRightPosition(setCorrectPositionOnACircle(radiusDefenseBase, -7000)); //radiusDefense = 3000
-        SetDefenseAllPosition(setCorrectPositionOnACircle(radiusDefenseBase, -3500));
-
-        Console.Error.WriteLine($"--> Defense Left Positions = {GetDefenseLeftPosition().X} : {GetDefenseLeftPosition().Y}");
-        Console.Error.WriteLine($"--> Defense Right Positions = {GetDefenseRightPosition().X} : {GetDefenseRightPosition().Y}");
-
-        SetMiddleLeftPosition(setCorrectPositionOnACircle(radiusMiddle, -2000));
-        SetMiddleRightPosition(setCorrectPositionOnACircle(radiusMiddle, -6000));
-        SetMiddleAllPosition(setCorrectPositionOnACircle(radiusMiddle, -4500));
-
-        SetOffenseLeftPosition(setCorrectPositionOnACircle(radiusOffense, -7000));
-        SetOffenseRightPosition(setCorrectPositionOnACircle(radiusOffense, -11000));
-        SetOffenseAllPosition(setCorrectPositionOnACircle(radiusOffense, -5000));
-
-    }
-    public static Vector2 setCorrectPositionOnACircle(int radius, float move)
-    {
-        // myLibrary.RotateByArc(Vector2 Center, Vector2 A, float arc)
-        // Vector2 center = GetHomeBasePosition();
-        Vector2 center = Map.baseLeft;
-        //Console.Error.WriteLine("===============================================");
-        Vector2 A = new Vector2(radius, 0);
-        //float arc = center.X == 0 ? move : move * -1;
-        float arc = move;
-        Vector2 rotByArc = myLibrary.RotateByArc(center, A, arc);
-        //Console./*Error*/.WriteLine($"rotByArc Pos = {rotByArc.X}:{rotByArc.Y}");
-
-        Vector2 temp = calculateCorrectPositionsFromHome(rotByArc);
-
-        //Console.Error.WriteLine($"Vec2 Return Pos = {temp.X}:{temp.Y}");
-        return rotByArc;
-
-    }
-
-
-    public static void setCorrectBasePosition(Vector2 homeBasePosition)
-    {
-        SetHomeBasePosition(homeBasePosition);
-        SetEnemyBasePosition((homeBasePosition.X == 0) ? baseRight : baseLeft);
-    }
-
-    public static Vector2 calculateCorrectPositionsFromHome(Vector2 position)
-    {
-        var homeX = (int)GetHomeBasePosition().X;
-        var homeY = (int)GetHomeBasePosition().Y;
-        //Console.Error.WriteLine($"------- >> {homeX}:{homeY} - {position.X}:{position.Y} = {homeX - position.X}:{homeY - position.Y}");
-        return new Vector2(Math.Abs(homeX - position.X), Math.Abs(homeY - position.Y));
-    }
-
-
-    /// <summary>
-    /// Intersects a line and a circle.
-    /// </summary>
-    /// <param name="location">the location of the circle</param>
-    /// <param name="radius">the radius of the circle</param>
-    /// <param name="lineFrom">the starting point of the line</param>
-    /// <param name="lineTo">the ending point of the line</param>
-    /// <returns>true if the line and circle intersect each other</returns>
-    public static bool IntersectLineCircle(Vector2 location, float radius, Vector2 lineFrom, Vector2 lineTo)
-    {
-        float ab2, acab, h2;
-
-        Vector2 ac = location - lineFrom;
-        Vector2 ab = lineTo - lineFrom;
-        ab2 = Vector2.Dot(ab, ab);
-        acab = Vector2.Dot(ac, ab);
-
-        float t = acab / ab2;
-
-        if (t < 0)
-            t = 0;
-        else if (t > 1)
-            t = 1;
-
-        Vector2 h = ((ab * t) + lineFrom) - location;
-        h2 = Vector2.Dot(h, h);
-
-        return (h2 <= (radius * radius));
-    }
-
-    public static string DirectionTo(Vector2 vector2)
-    {
-        if (GetHomeBasePosition().X == 0)
-            if (vector2.X < 0 && vector2.Y < 0)
-                return "home";
-            else if (vector2.X > 0 && vector2.Y > 0)
-                return "enemy";
-
-        if (GetHomeBasePosition().X != 0)
-            if (vector2.X > 0 && vector2.Y > 0)
-                return "home";
-            else if (vector2.X < 0 && vector2.Y < 0)
-                return "enemy";
-        
-        return "nothing";
-    }
-}
-
+/**
+ * Auto-generated code below aims at helping you parse
+ * the standard input according to the problem statement.
+ **/
 class Player
 {
-
-
     public const int TYPE_MONSTER = 0;
     public const int TYPE_MY_HERO = 1;
     public const int TYPE_OP_HERO = 2;
 
 
-    public const int TIER_DEFENSE_LEFT = 0;
-    public const int TIER_DEFENSE_RIGHT = 1;
-    public const int TIER_DEFENSE_ALL = 2;
 
-    public const int TIER_MIDDLE_LEFT = 3;
-    public const int TIER_MIDDLE_RIGHT = 4;
-    public const int TIER_MIDDLE_ALL = 5;
-
-    public const int TIER_OFFENSE_LEFT = 6;
-    public const int TIER_OFFENSE_RIGHT = 7;
-    public const int TIER_OFFENSE_ALL = 8;
-
-    public const int RADIUS_FOG = 2200;
-    public const int RADIUS_WIND = 1000;
-
-    public const int AREA_OFFENSE_TARGET = 500;
-
-
-    public static Random rand = new Random();
-    
-    
-
-
-
-    public class Entity
-    {
-        public int Id;
-        public int Type;
-        public int X, Y;
-        public int ShieldLife;
-        public int IsControlled;
-        public int Health;
-        public int Vx, Vy;
-        public int NearBase;
-        public int ThreatFor;
-        public int ThreadPoints;
-        public float DistanceFromEntityToBase;
-        public float DistanceFromEntityToEnemyBase;
-        public Vector2 Direction;
-        public string HeadingTo;
-
-
-
-
-        public Entity(int id, int type, int x, int y, int shieldLife, int isControlled, int health, int vx, int vy, int nearBase, int threatFor, int threadPoints, float distanceFromEntityToBase, float distanceFromEntityToEnemyBase, Vector2 direction, string headingTo) //, float toLeftBase, float toRightBase)
-        {
-            this.Id = id;
-            this.Type = type;
-            this.X = x;
-            this.Y = y;
-            this.ShieldLife = shieldLife;
-            this.IsControlled = isControlled;
-            this.Health = health;
-            this.Vx = vx;
-            this.Vy = vy;
-            this.NearBase = nearBase;
-            this.ThreatFor = threatFor;
-            this.ThreadPoints = threadPoints;
-            this.DistanceFromEntityToBase = distanceFromEntityToBase;
-            this.DistanceFromEntityToEnemyBase = distanceFromEntityToEnemyBase;
-            this.Direction = direction;
-            this.HeadingTo = headingTo;
-        }
-    }
 
     static void Main(string[] args)
     {
-
         string[] inputs;
         inputs = Console.ReadLine().Split(' ');
-        Entity offenseTargetFocus = null;
-
-        // base_x,base_y: The corner of the map representing your base
-        int baseX = int.Parse(inputs[0]);
+        int baseX = int.Parse(inputs[0]); // The corner of the map representing your base
         int baseY = int.Parse(inputs[1]);
 
+        Map.HomeBase = new Vector2(baseX, baseY);
+        Map.EnemyBase = Map.setEnemyBase(Map.HomeBase);
+        int heroesPerPlayer = int.Parse(Console.ReadLine()); // Always 3
+
         
-        Map.startSettingProperties(new Vector2(baseX, baseY));
+        var targetOffense = new List<Entity>();
 
-        // heroesPerPlayer: Always 3
-        int heroesPerPlayer = int.Parse(Console.ReadLine());
-
+        Map.setPositions();
 
         // game loop
         while (true)
         {
+            Entity.countingRounds++;
             #region StartWhile
-
-
-
             inputs = Console.ReadLine().Split(' ');
             int myHealth = int.Parse(inputs[0]); // Your base health
             int myMana = int.Parse(inputs[1]); // Ignore in the first league; Spend ten mana to cast a spell
@@ -276,14 +49,15 @@ class Player
             int oppMana = int.Parse(inputs[1]);
 
             int entityCount = int.Parse(Console.ReadLine()); // Amount of heros and monsters you can see
-            
+
 
             List<Entity> myHeroes = new List<Entity>(entityCount);
             List<Entity> oppHeroes = new List<Entity>(entityCount);
             List<Entity> monsters = new List<Entity>(entityCount);
-            // List<Entity> targets = new List<Entity>(entityCount);
+
             #endregion
 
+            targetOffense = monsters.Where(x => x.DistanceToEnemyBase < 15000 && x.DistanceToBase > 8000).OrderByDescending(x => x.DistanceToEnemyBase).ToList();
 
             #region Entities
             for (int i = 0; i < entityCount; i++)
@@ -291,8 +65,11 @@ class Player
                 inputs = Console.ReadLine().Split(' ');
                 int id = int.Parse(inputs[0]); // Unique identifier
                 int type = int.Parse(inputs[1]); // 0=monster, 1=your hero, 2=opponent hero
+
                 int x = int.Parse(inputs[2]); // Position of this entity
                 int y = int.Parse(inputs[3]);
+                var posOfEntity = new Vector2(x, y);
+
                 int shieldLife = int.Parse(inputs[4]); // Ignore for this league; Count down until shield spell fades
                 int isControlled = int.Parse(inputs[5]); // Ignore for this league; Equals 1 when this entity is under a control spell
                 int health = int.Parse(inputs[6]); // Remaining health of this monster
@@ -301,32 +78,12 @@ class Player
                 int nearBase = int.Parse(inputs[9]); // 0=monster with no target yet, 1=monster targeting a base
                 int threatFor = int.Parse(inputs[10]); // Given this monster's trajectory, is it a threat to 1=your base, 2=your opponent's base, 0=neither
 
-                var distanceEntityToHome = myLibrary.calculateCorrectDistance(Map.GetHomeBasePosition(), new Vector2(x, y));
-                float distanceEntityToEnemyBase = myLibrary.calculateCorrectDistance(Map.GetEnemyBasePosition(), new Vector2(x, y));
+                var distanceToBase = Vector2.Distance(Map.HomeBase, new Vector2(x,y));
+                var distanceToEnemyBase = Vector2.Distance(Map.EnemyBase, new Vector2(x,y));
 
-                //var distanceFromSpiderToLeftBase = myLibrary.calculateCorrectDistance(BASE_LEFT, new Vector2(x, y));
-                //var distanceFromSpiderToRightBase = myLibrary.calculateCorrectDistance(BASE_RIGHT, new Vector2(x, y));
-
-                var threadPoints = 0;
-                string directionToBase = Map.DirectionTo(new Vector2(vx, vy));
-
-
-                switch (type)
-                {
-                    case TYPE_MONSTER:
-                        if (directionToBase == "home")
-                            threadPoints += 500;
-                        if (threatFor == 1)
-                            threadPoints += 500;
-                        if (distanceEntityToHome < 5000f)
-                            threadPoints += 500;
-                        break;
-
-                }
-
-
+          
                 Entity entity = new Entity(
-                    id, type, x, y, shieldLife, isControlled, health, vx, vy, nearBase, threatFor, threadPoints, distanceEntityToHome, distanceEntityToEnemyBase, new Vector2(vx, vy), directionToBase // , distanceFromSpiderToLeftBase, distanceFromSpiderToRightBase
+                    id, type, x, y, shieldLife, isControlled, health, vx, vy, nearBase, threatFor, distanceToBase, distanceToEnemyBase, posOfEntity
                 );
 
                 switch (type)
@@ -342,445 +99,490 @@ class Player
                         break;
                 }
             }
-
-            #endregion entities
-
-            Console.Error.WriteLine($"MonsterCount = {monsters.Count}");
+            #endregion
 
 
-            var monsterSortedToHomeBase = myLibrary.SortMonsters(monsters, Map.GetHomeBasePosition());
-            var monsterSortedToEnemyBase = myLibrary.SortMonsters(monsters, Map.GetEnemyBasePosition());
+            
 
-            foreach (var target in monsterSortedToHomeBase)
-                Console.Error.WriteLine("INFO defense: targets are: " + target.Id + " " + target.Type + " " + target.ThreadPoints + " " + target.DistanceFromEntityToBase + " " + target.X + ":" + target.Y);
-            foreach (var target in monsterSortedToEnemyBase)
-                Console.Error.WriteLine("INFO offense: targets are: " + target.Id + " " + target.Type + " " + target.ThreadPoints + " " + target.DistanceFromEntityToBase + " " + target.X + ":" + target.Y);
+            
 
-
-
-            Console.Error.WriteLine("INFO: Start Action for Heroes!!!");
+            
 
 
             for (int i = 0; i < heroesPerPlayer; i++)
             {
                 switch (i)
                 {
-                    case 3:
-                    case 0:
-                        //Console.Error.WriteLine($"Hero {i} goes defense");
-                        if (monsterSortedToHomeBase.Count > 0)
-                            defense(new Vector2(myHeroes[i].X, myHeroes[i].Y), monsterSortedToHomeBase, i, myMana, TIER_DEFENSE_LEFT, Map.GetHomeBasePosition());
-                        else
-                        {
-                            Console.Error.WriteLine("INFO DEFENSE: Left Position");
-                            myLibrary.move(Map.GetDefenseLeftPosition());
-                        }
-                        break;
-                    case 4:
-                    case 1:
-                        //Console.Error.WriteLine($"\nHero {i} goes defense");
-                        if (monsterSortedToHomeBase.Count > 0)
-                            defense(new Vector2(myHeroes[i].X, myHeroes[i].Y), monsterSortedToHomeBase, i, myMana, TIER_DEFENSE_RIGHT, Map.GetHomeBasePosition());
-                        else
-                        {
-                            Console.Error.WriteLine("INFO DEFENSE: Right Position");
-                            myLibrary.move(Map.GetDefenseRightPosition());
-                        }
-                        break;
-                    case 5:
-                    case 2:
-                        //Console.Error.WriteLine($"\nHero {i} goes offense");
-                        if ((monsterSortedToHomeBase.Count > 0 && monsterSortedToHomeBase.Count < 5 && monsterSortedToHomeBase[0].Health < 15) || myHealth < 1) //myMana < 30 && 
-                            offenseTargetFocus = offense(new Vector2(myHeroes[i].X, myHeroes[i].Y), monsterSortedToHomeBase, i, myMana, TIER_MIDDLE_ALL, oppHeroes, Map.GetHomeBasePosition(), offenseTargetFocus);
-                        else if (monsterSortedToEnemyBase.Count > 0 && monsterSortedToEnemyBase[0].Health >= 20)
-                        {
-                            offenseTargetFocus = offense(new Vector2(myHeroes[i].X, myHeroes[i].Y), monsterSortedToEnemyBase, i, myMana, TIER_OFFENSE_ALL, oppHeroes, Map.GetEnemyBasePosition(), offenseTargetFocus);
+                    case 0: // Defense Player
+                        if (myMana > 300)
+                            Map.goOffense = true;
+                        if (myMana < 70)
+                            Map.goOffense = false;
 
+                        if (!Map.goOffense)
+                        {
+                            Console.Error.WriteLine("Defense");
+                            Entity.defense(monsters, myHeroes, oppHeroes, 0);
                         }
                         else
-                            myLibrary.move(Map.GetOffenseAllPosition());
+                        {
+                            Console.Error.WriteLine("ATTACK!!!!!!!!!!!!!!!!!!!!!!!");
+
+                            Entity.offense(monsters, myHeroes, oppHeroes, 0);
+                        }
                         break;
-
-                };
-
-
-            }
-            if (offenseTargetFocus != null)
-                Console.Error.WriteLine($"\nINFO END: Target for next Round: {offenseTargetFocus.Id}");
-            else
-                Console.Error.WriteLine($"\nINFO END: no Target for next Round");
-        }
-    }
-
-
-
-
-    static void defense(Vector2 myHero, List<Player.Entity> myTarget, int hero, int defenseMana, int version, Vector2 homeBase)
-    {
-        Vector2 trianglePoint1 = new Vector2();
-        Vector2 trianglePoint2 = new Vector2();
-        Vector2 trianglePoint3 = new Vector2();
-        //bool targeting = false;
-
-        Console.Error.Write($"\nDEFENSE: Hero {hero}: Start ");
-
-        switch (version)
-        {
-            case 0:
-                // Left Triangle from Base
-                // TIER_DEFENSE_LEFT = 0
-
-                Console.Error.Write($"-> TIER_DEFENSE_LEFT ");
-                (trianglePoint1, trianglePoint2, trianglePoint3) = myLibrary.formTriangle(Map.baseLeft, version);
-                break;
-
-            case 1:
-                // Right Triangle from Base
-                // TIER_DEFENSE_RIGHT = 2
-
-                Console.Error.Write($"-> TIER_DEFENSE_RIGHT ");
-                (trianglePoint1, trianglePoint2, trianglePoint3) = myLibrary.formTriangle(Map.baseLeft, version);
-                break;
-
-            case 2:
-                //Defense from Base
-                // TIER_DEFENSE_ALL = 3
-
-                Console.Error.Write($"-> TIER_DEFENSE_ALL ");
-                (trianglePoint1, trianglePoint2, trianglePoint3) = myLibrary.formTriangle(Map.baseLeft, version);
-                break;
-
-        }
-
-        var targetsInReach = myTarget.Where(e => myLibrary.PointInTriangle(new Vector2(e.X, e.Y), trianglePoint1, trianglePoint2, trianglePoint3)).OrderBy(x => x.DistanceFromEntityToBase).ToList(); //.OrderBy(x => x.DistanceFromEnemyToBase)
-
-        if (targetsInReach.Count > 0)
-        {
-            var itemsPosition = new Vector2(targetsInReach[0].X, targetsInReach[0].Y);
-
-            Console.Error.Write($"-> targeting: {targetsInReach[0].Id}: {targetsInReach[0].X} {targetsInReach[0].Y} ");
-
-            var windInRange = myLibrary.PointInCircle(myHero, itemsPosition, RADIUS_WIND);
-
-            if (windInRange && defenseMana >= 10 && targetsInReach[0].DistanceFromEntityToBase < 3000)
-            {
-                myLibrary.wind();
-                Console.Error.WriteLine($"-> WIND");
-            }
-            else
-            {
-                Console.Error.WriteLine($"-> ATTACK");
-                myLibrary.move(itemsPosition);
-            }
-
-        }
-        else
-        {
-            Console.Error.Write($"-> no Enemy in Triangle\n --> ");
-            switch (version)
-            {
-                case 0:
-                    // Left Triangle from Base
-                    // TIER_DEFENSE_LEFT = 0
-                    Console.Error.Write($"-> going defense left ");
-                    myLibrary.move(Map.GetDefenseLeftPosition());
-
-                    break;
-                case 1:
-                    // Right Triangle from Base
-                    // TIER_DEFENSE_RIGHT = 2
-                    Console.Error.Write($"-> going defense right ");
-                    myLibrary.move(Map.GetDefenseRightPosition());
-
-                    break;
-
-                case 2:
-                    //Defense from Base
-                    // TIER_DEFENSE_ALL = 3
-                    Console.Error.Write($"-> going defense all ");
-                    myLibrary.move(Map.GetDefenseAllPosition());
-                    break;
-
-            }
-
-        }
-
-    }
-
-    static Entity offense(Vector2 offenseHeroes, List<Player.Entity> monster, int hero, int offenseMana, int defaultPosition, List<Entity> oppHeroes, Vector2 toBase, Entity offenseTargetFocus)
-    {
-
-        var positionSpider = new Vector2();
-        float nearestOppHeroMin = 9999.0f; // = myLibrary.calculateCorrectDistance(BASE_RIGHT, new Vector2(x, y));
-        int targetOppHeroID = 0;
-        List<Player.Entity> enemyBaseTarget = new List<Player.Entity>();
-        List<Player.Entity> enemyBaseTargetNear = new List<Player.Entity>();
-        List<Player.Entity> enemyBaseTargetFar = new List<Player.Entity>();
-
-        Vector2 targetOppHeroPos = new Vector2();
-        if (oppHeroes.Count > 0)
-        {
-            foreach (var oppHero in oppHeroes)
-            {
-                var nearestOppHeroDistance = myLibrary.calculateCorrectDistance(Map.GetEnemyBasePosition(), new Vector2(oppHero.X, oppHero.Y));
-                if (nearestOppHeroDistance < nearestOppHeroMin)
-                {
-                    nearestOppHeroDistance = nearestOppHeroMin;
-                    targetOppHeroID = oppHero.Id;
-                    targetOppHeroPos = new Vector2(oppHero.X, oppHero.Y);
-
-                }
-                Console.Error.WriteLine($"Targeting OpHero {targetOppHeroID}");
-            }
-        }
-        else
-            targetOppHeroPos = Map.GetOffenseAllPosition();
-
-
-        Console.Error.Write($"\nOFFENSE: Hero {hero}: Start ");
-        
-
-        if (offenseTargetFocus != null)
-        {
-            Console.Error.Write("-> offenseTargetFocus is not null ");
-            var tempCheck = monster.Where(x => x.Id == offenseTargetFocus.Id).ToList();
-
-            if (tempCheck.Count == 0)
-            {
-                Console.Error.WriteLine($"-> Target is gone ");
-                offenseTargetFocus = null;
-            }
-        }
-        
-
-        //Console.Error.WriteLine($"�������������� {tempCheck}");
-
-        if (offenseTargetFocus != null)
-            Console.Error.WriteLine($"==>>>Targeting == {offenseTargetFocus.Id}");
-        else
-            Console.Error.WriteLine($"==>>>offenseTargetFocus is null");
-
-        if (offenseTargetFocus == null)
-        {
-            Console.Error.WriteLine($"INFO OFFENSE: 5 Middle, 8 Offense {defaultPosition}");
-            switch (defaultPosition)
-            {
-                case 5:
-                    enemyBaseTarget = monster.Where(x => x.DistanceFromEntityToEnemyBase < Map.radiusOffense).OrderByDescending(y => y.DistanceFromEntityToEnemyBase).ToList(); //Where(x => x.ThreatFor == 2). .Where(z => z.DistanceFromEnemyToEnemyBase > 5000)
-                    break;
-                case 8:
-
-                    enemyBaseTarget = monster.Where(x => x.DistanceFromEntityToEnemyBase < Map.radiusMiddle).ToList(); //Where(x => x.ThreatFor == 2). .Where(z => z.DistanceFromEnemyToEnemyBase > 5000)
-                    enemyBaseTargetNear = monster.Where(x => x.DistanceFromEntityToEnemyBase < Map.radiusDefense).OrderByDescending(y => y.DistanceFromEntityToEnemyBase).ToList(); //Where(x => x.ThreatFor == 2). .Where(z => z.DistanceFromEnemyToEnemyBase > 5000)
-                    break;
-            }
-
-            if (enemyBaseTarget.Count > 0)
-            {
-                foreach (var target in enemyBaseTarget)
-                    Console.Error.WriteLine("INFO OFFENSE: targets are: " + target.Id + " " + target.Type + " " + target.ThreadPoints + " " + target.DistanceFromEntityToEnemyBase + " " + target.Direction.X + ":" + target.Direction.Y);
-
-                Console.Error.Write("-> getting Target ");
-
-                positionSpider = new Vector2(enemyBaseTarget[0].X, enemyBaseTarget[0].Y); //new Vector2(item.X, item.Y);
-                offenseTargetFocus = enemyBaseTarget[0];
-                Console.Error.Write($"-> Targeting {offenseTargetFocus.Id} Heading {offenseTargetFocus.HeadingTo}; Mana: {offenseMana} ");
-
-
-
-
-
-
-                if (offenseTargetFocus.HeadingTo != "enemy" && offenseMana > 20 && enemyBaseTarget[0].DistanceFromEntityToEnemyBase < 6000)
-                {
-                    Console.Error.WriteLine($"-> Mana -> Control");
-                    myLibrary.control(offenseTargetFocus.Id);
-
-                }
-                else if (offenseTargetFocus.HeadingTo == "enemy" && offenseTargetFocus.ShieldLife == 0 && offenseMana > 10 && enemyBaseTarget[0].DistanceFromEntityToEnemyBase < 6000)
-                {
-                    Console.Error.WriteLine($"-> Mana -> Shield");
-                    myLibrary.shield(offenseTargetFocus.Id);
-                }
-                else if (offenseMana > 200)
-                {
-                    Console.Error.WriteLine($"-> Mana -> Wind");
-                    myLibrary.wind();
-                }
-                else if (offenseTargetFocus.ShieldLife == 0) // && offenseTargetFocus.HeadingTo != "enemy")
-                    myLibrary.move(positionSpider);
-                else
-                    myLibrary.move(Map.GetOffenseAllPosition());
-
-
-
-            }
-            else
-                switch (defaultPosition)
-                {
-                    case 5:
-                        myLibrary.move(Map.GetMiddleAllPosition());
+                    case 1: // Defense Player
+                        if (Map.goOffense == false)
+                            Entity.defense(monsters, myHeroes, oppHeroes, 1);
+                        else
+                            Entity.defense(monsters, myHeroes, oppHeroes, 2);
                         break;
-                    case 8:
-                        Console.Error.WriteLine("-> heading OffenseAll");
-                        myLibrary.move(Map.GetOffenseAllPosition());
+                    case 2: // Defense Player
+                        if (Map.goOffense == false)
+                            Entity.defense(monsters, myHeroes, oppHeroes, 0);
+                        else
+                            Entity.defense(monsters, myHeroes, oppHeroes, 2);
                         break;
                 }
-
-        }
-        else
-        {
-
-            
-            var tempCheck = monster.Where(x => x.Id == offenseTargetFocus.Id).ToList();
-
-            if (tempCheck == null)
-            {
-                Console.Error.WriteLine($"-> Target is gone ");
-                offenseTargetFocus = null;
-                return offenseTargetFocus;
             }
-
-            Console.Error.WriteLine($"==>>Targeting Attack {tempCheck[0].Id}");
-            myLibrary.move(new Vector2(tempCheck[0].X, tempCheck[0].Y));
-            return tempCheck[0];
+            if (Entity.countingRounds > 10) Entity.countingRounds = 0;
         }
-
-        // myLibrary.move(new Vector2(offenseTargetFocus.X, offenseTargetFocus.Y));
-        return offenseTargetFocus;
     }
 }
 
-    public static class myLibrary
+
+internal class Map
+{
+    public static Vector2 leftBase = new Vector2(0, 0);
+    public static Vector2 rightBase = new Vector2(17630, 9000);
+
+    public static Vector2 HomeBase;
+    public static Vector2 EnemyBase;
+
+    public static List<Vector2> posDefense = new List<Vector2>();
+    public static Vector2 posDefense2;
+    public static Vector2 posDefenseMiddle;
+    public static Vector2 posMiddleMiddle;
+    public static Vector2 posOffenseMiddle;
+    public static bool goOffense = false;
+    internal static bool shielding;
+
+    internal static void setPosDefenses()
     {
-        #region commands
-        public static void wait()
-        {
-            Console.WriteLine("WAIT");
-        }
-        public static void move(Vector2 position)
-        {
-            Console.WriteLine($"MOVE {(int)position.X} {(int)position.Y}");
-        }
-        public static void wind()
-        {
-            Console.WriteLine($"SPELL WIND {(int)Map.GetEnemyBasePosition().X} {(int)Map.GetEnemyBasePosition().Y}");
-        }
+        posDefense.Add(myMath.calculateCorrectPositionFrom(HomeBase, new Vector2(7500, 2500)));
+        posDefense.Add(myMath.calculateCorrectPositionFrom(HomeBase, new Vector2(4500, 7500)));
+        posDefense.Add(myMath.calculateCorrectPositionFrom(HomeBase, new Vector2(2000, 2000)));
+    }
 
-        public static void control(int controlID)
-        {
-            Console.WriteLine($"SPELL CONTROL {controlID} {(int)Map.GetEnemyBasePosition().X}  {(int)Map.GetEnemyBasePosition().Y}");
+    internal static void setPosMiddle()
+    {
+        posMiddleMiddle = myMath.calculateCorrectPositionFrom(HomeBase, new Vector2(8500, 4500));
+    }
 
-        }
+    internal static void setPosOffense()
+    {
+        posOffenseMiddle = myMath.calculateCorrectPositionFrom(HomeBase, new Vector2(14000, 6000));
+    }
 
-        internal static void shield(int spider)
-        {
-            Console.Error.WriteLine($"\nGoing to shield {spider}");
-            Console.WriteLine($"SPELL SHIELD {spider}");
-        }
+    internal static Vector2 setEnemyBase(Vector2 myHomeBase)
+    {
+        return myHomeBase.X == 0 ? rightBase : leftBase;
+    }
 
-        #endregion
+    internal static void setPositions()
+    {
+        setPosDefenses();
+        setPosMiddle();
+        setPosOffense();
+    }
 
-        #region Maths
-        public static bool PointInCircle(Vector2 hero, Vector2 p, int radius)
-        {
-            var dx = Math.Abs(hero.X - p.X);
-            var dy = Math.Abs(hero.Y - p.Y);
-            var R = radius;
+    internal static bool PointInCircle(Entity hero, Vector2 p, int radius)
+    {
 
-            if (dx + dy <= R) return true;
-            if (dx > R) return false;
-            if (dy > R) return false;
-            if ((Math.Pow(dx, 2) + Math.Pow(dy, 2)) <= Math.Pow(R, 2)) return true;
-            else return false;
-        }
+        var dx = Math.Abs(hero.X - p.X);
+        var dy = Math.Abs(hero.Y - p.Y);
+        var R = radius;
 
-        public static bool PointInTriangle(Vector2 p, Vector2 p0, Vector2 p1, Vector2 p2)
-        {
-            var s = (p0.X - p2.X) * (p.Y - p2.Y) - (p0.Y - p2.Y) * (p.X - p2.X);
-            var t = (p1.X - p0.X) * (p.Y - p0.Y) - (p1.Y - p0.Y) * (p.X - p0.X);
-
-            if ((s < 0) != (t < 0) && s != 0 && t != 0)
-                return false;
-
-            var d = (p2.X - p1.X) * (p.Y - p1.Y) - (p2.Y - p1.Y) * (p.X - p1.X);
-            return d == 0 || (d < 0) == (s + t <= 0);
-        }
-
-        public static float calculateCorrectDistance(Vector2 bases, Vector2 entity)
-        {
-            return (Math.Abs(Vector2.Distance(bases, entity)));
-        }
-
-        internal static List<Player.Entity> SortMonsters(List<Player.Entity> monsters, Vector2 direction)
-        {
-
-            return direction.X == 0 ? monsters.OrderBy(y => y.DistanceFromEntityToBase).ToList() : monsters.Where(x => x.DistanceFromEntityToEnemyBase < 8000).OrderByDescending(y => y.DistanceFromEntityToEnemyBase).ToList();
-
-
-            //.ThenByDescending(y => y.DistanceFromEnemyToBase)  .Where(c => c.ThreadPoints >= 0)  .ThenByDescending(x => x.ThreadPoints)
-        }
-
-
-
-        public static (Vector2 trianglePoint1, Vector2 trianglePoint2, Vector2 trianglePoint3) formTriangle(Vector2 whereToForm, int whichTrianglePart)
-        {
-        
-            if (whichTrianglePart == 0)
-                return (
-                Map.calculateCorrectPositionsFromHome(whereToForm), 
-                Map.calculateCorrectPositionsFromHome(Map.setCorrectPositionOnACircle(Map.radiusDefenseBase + 1000, whereToForm.Y)), 
-                Map.calculateCorrectPositionsFromHome(Map.setCorrectPositionOnACircle(Map.radiusDefenseBase + 1000, -7000)));
-            else if (whichTrianglePart == 1)
-                return (
-                Map.calculateCorrectPositionsFromHome(whereToForm),
-                Map.calculateCorrectPositionsFromHome(Map.setCorrectPositionOnACircle(Map.radiusDefenseBase + 500, -5000)),
-                Map.calculateCorrectPositionsFromHome(Map.setCorrectPositionOnACircle((int)whereToForm.X, -18000)));
-            else if (whichTrianglePart == 2)
-                return (
-                Map.calculateCorrectPositionsFromHome(whereToForm),
-                Map.calculateCorrectPositionsFromHome(Map.setCorrectPositionOnACircle(Map.radiusDefenseBase + 500, whereToForm.Y)),
-                Map.calculateCorrectPositionsFromHome(Map.setCorrectPositionOnACircle((int)whereToForm.X, -15000)));
-
-            return (new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0));
-        }
-
-        public static Vector2 calculateCorrectPositions(Vector2 whereToForm, int deltaX, int deltaY)
-        {
-            return new Vector2(Math.Abs((int)whereToForm.X - deltaX), Math.Abs((int)whereToForm.Y - deltaY));
-        }
-
-
-        public static Vector2 RotateByArc(Vector2 Center, Vector2 A, float arc)
-        {
-            //calculate radius
-            float radius = Vector2.Distance(Center, A);
-
-            //calculate angle from arc
-            float angle = arc / radius;
-
-            Vector2 B = RotateByRadians(Center, A, angle);
-
-            return B;
-        }
-
-        public static Vector2 RotateByRadians(Vector2 Center, Vector2 A, float angle)
-        {
-            //Move calculation to 0,0
-            Vector2 v = Vector2.Subtract(A, Center);
-
-            //rotate x and y
-            float x = (float)(v.X * Math.Cos(angle) + v.Y * Math.Sin(angle));
-            float y = (float)(v.Y * Math.Cos(angle) - v.X * Math.Sin(angle));
-
-            //move back to center
-            Vector2 B = new Vector2(x, y) + Center;
-
-            return B;
-        }
-
-
-        #endregion
+        if (dx + dy <= R) return true;
+        if (dx > R) return false;
+        if (dy > R) return false;
+        if ((Math.Pow(dx, 2) + Math.Pow(dy, 2)) <= Math.Pow(R, 2)) return true;
+        else return false;
 
     }
 
+    
+}
+
+internal class myMath
+{
+    public static Random rand = new Random(); 
+    internal static Vector2 calculateCorrectPositionFrom(Vector2 basePosition, Vector2 vector2)
+    {
+        if (basePosition.X == 0)
+        {
+            return vector2;
+        }
+        else
+        {
+            return Vector2.Subtract(basePosition, vector2);
+        }
+    }
+
+    internal static bool checkAboveLine(Vector2 pos1, Vector2 pos2, Vector2 target) //Map.HomeBase, new Vector2(7000, 5500), targetDefense[0].Position);
+    {
+        return ((pos2.X - pos1.X) * (target.Y - pos1.Y) - (pos2.Y - pos1.Y) * (target.X - pos1.X)) < 0;
+    }
+
+    internal static Vector2 calculateAwayfromHome(Vector2 position)
+    {
+        Vector2 direction = Vector2.Subtract(position, Map.HomeBase);  // Vector2.Normalize(
+        Vector2 normalizeDir = Vector2.Normalize(direction);
+        Vector2 positionTo = new Vector2(direction.X, direction.Y + normalizeDir.Y * 10);
+        Console.Error.WriteLine($"calculateAwayfromHome: {positionTo.X} - {positionTo.Y}");
+        return positionTo;
+    }
+}
+
+public class Entity
+{
+    public int Id;
+    public int Type;
+    public int X, Y;
+    public int ShieldLife;
+    public int IsControlled;
+    public int Health;
+    public int Vx, Vy;
+    public int NearBase;
+    public int ThreatFor;
+    public int ThreadPoints;
+    public float DistanceToBase;
+    public float DistanceToEnemyBase;
+    public Vector2 Position;
+    public bool EnemyControllsEntity;
+    public bool EntityIsShielded;
+
+    public bool DirectionEnemyBase;
+    public static bool warningControlled = false;
+    public static bool warningShielded = false;
+    public static int countingShielded = 0;
+    public static int countingRounds = 0;
+
+    public const int RADIUS_WIND = 800;
+    public static List<Entity> targetDefense = new List<Entity>();
+
+
+    public Vector2 Direction;
+    public string HeadingTo;
+    internal static bool goOffense = false;
+
+    public Entity(int id, int type, int x, int y, int shieldLife, int isControlled, int health, int vx, int vy, int nearBase, int threatFor, float distanceToBase, float distanceToEnemyBase, Vector2 position) // , bool directionEnemyBase) //, bool enemyControllsEntity) //, bool enemyShieldsEntity) //, int threadPoints, float distanceFromEntityToBase, float distanceFromEntityToEnemyBase, Vector2 direction, string headingTo) //, float toLeftBase, float toRightBase)
+    {
+        this.Id = id;
+        this.Type = type;
+        this.X = x;
+        this.Y = y;
+        this.ShieldLife = shieldLife;
+        this.IsControlled = isControlled;
+        this.Health = health;
+        this.Vx = vx;
+        this.Vy = vy;
+        this.NearBase = nearBase;
+        this.ThreatFor = threatFor;
+        this.DistanceToEnemyBase = distanceToEnemyBase;
+        this.DistanceToBase = distanceToBase;
+        this.Position = position;
+        this.EnemyControllsEntity = isControlled == 1 ? true : false;
+        this.EntityIsShielded = shieldLife > 0 ? true : false;
+        if ((Map.HomeBase.X == 0 && Vx > 0 && Vy > 0) || (Map.HomeBase.X != 0 && Vx < 0 && Vy < 0))
+            this.DirectionEnemyBase = true;
+    }
+
+    internal static void move(Vector2 position)
+    {
+        Console.WriteLine($"MOVE {position.X} {position.Y}");
+    }
+
+    internal static void wind(Vector2 position)
+    {
+        //Vector2 direction = myMath.calculateAwayfromHome(position);
+        Console.WriteLine($"SPELL WIND {Map.EnemyBase.X} {Map.EnemyBase.Y}");
+    }
+
+    internal static void shield(Entity entity)
+    {
+        Console.WriteLine($"SPELL SHIELD {entity.Id}");
+        Entity.countingShielded++;
+    }
+
+    internal static void control(int id, Vector2 direction)
+    {
+        Console.WriteLine($"SPELL CONTROL {id} {direction.X} {direction.Y}");
+    }
+
+    internal static void defense(List<Entity> monsters, List<Entity> myHeroes, List<Entity> oppHeroes, int Version)
+    {
+        //bool isInMyArea = false;
+        //Entity.enemyShieldsSpider = false;
+        int distanceDefense = 11000;
+        Vector2 seperateLine = myMath.calculateCorrectPositionFrom(Map.HomeBase, new Vector2(10000, 9000));
+        var tempDefense = Version;
+
+
+        List<List<Entity>> targetDefense = new List<List<Entity>>();
+
+        targetDefense.Add(new List<Entity>());
+        targetDefense.Add(new List<Entity>());
+        targetDefense.Add(monsters.Where(x => x.DistanceToBase < distanceDefense).OrderBy(x => x.DistanceToBase).ToList());
+
+
+        Console.Error.WriteLine($"INFO: defense count = {targetDefense.Last().Count}");
+
+        if (Version != 2)
+        {
+            foreach (var target in targetDefense.Last())
+            {
+                if (myMath.checkAboveLine(Map.HomeBase, seperateLine, target.Position))
+                {
+                    targetDefense[0].Add(target);
+                    Console.Error.WriteLine($"DEFENSE LEFT: {target.Id}; Shield: {target.ShieldLife}");
+                }
+                else
+                {
+                    targetDefense[1].Add(target);
+                    Console.Error.WriteLine($"DEFENSE RIGHT: {target.Id}; Shield: {target.ShieldLife}");
+                }
+            }
+        }
+        else
+        {
+            Console.Error.WriteLine("---------------------> Version is 2 <--------------------");
+            Console.Error.WriteLine($"---------------------> {targetDefense[Version].Count}");
+        }
+
+        //if (Map.goOffense == true)
+        //{
+        //    Console.Error.WriteLine("INFO: Defense all");
+        //    Version = 2;
+
+        //}
+        if (targetDefense[Version].Count == 0)
+        {
+            Console.Error.WriteLine($"DEFENSE {Version}: No Targets");
+            Entity.move(Map.posDefense[Version]);
+        }
+        else
+        {
+            var Alarm = Entity.defenseAlarm(myHeroes, myHeroes[Version], targetDefense[Version][0]);
+
+            foreach (var Hero in myHeroes)
+            {
+                if (myHeroes[Version].EnemyControllsEntity == true && myHeroes[0].EnemyControllsEntity == false)
+                    Entity.warningControlled = true;
+            }
+
+            if (Entity.warningControlled && myHeroes[Version].EntityIsShielded == false)
+                Entity.shield(myHeroes[Version]);
+            else if (Alarm && targetDefense[Version][0].EntityIsShielded == false)
+                Entity.wind(Map.EnemyBase);
+            else
+            {
+                Console.Error.WriteLine($"DEFENSE {Version}: Targeting {targetDefense[Version][0].Id}");
+                Entity.move(targetDefense[Version][0].Position);
+            }
+        }
+    }
+
+    private static bool defenseAlarm(List<Entity> heroes, Entity hero, Entity targetDefense)
+    {
+        int distanceAlarm = 3000;
+
+        if (targetDefense.DistanceToBase < distanceAlarm && 
+            (
+            Map.PointInCircle(heroes[0], targetDefense.Position, RADIUS_WIND) && heroes[0].DistanceToBase < distanceAlarm ||
+            Map.PointInCircle(heroes[1], targetDefense.Position, RADIUS_WIND) && heroes[1].DistanceToBase < distanceAlarm ||
+            Map.PointInCircle(heroes[2], targetDefense.Position, RADIUS_WIND) && heroes[2].DistanceToBase < distanceAlarm))
+        {
+            Console.Error.WriteLine("DEFENSE LEFT: It's windy");
+            return true;
+        }
+        else
+        {
+            Console.Error.WriteLine("DEFENSE LEFT: It's not windy");
+            return false;
+        }
+    }
+
+    internal static void offense(List<Entity> monsters, List<Entity> myHeroes, List<Entity> oppHeroes, int Version)
+    {
+        int distanceOffense = 7000;
+        //Vector2 seperateLine = new Vector2(8000, 7000);
+        
+
+        List<List<Entity>> targetOffense = new List<List<Entity>>();
+
+        targetOffense.Add(monsters.Where(x => x.DistanceToEnemyBase < distanceOffense).OrderBy(x => x.DistanceToBase).ToList());
+        targetOffense.Add(new List<Entity>());
+        targetOffense.Add(new List<Entity>());
+
+        var monstersShielded = monsters.Where(x => x.DirectionEnemyBase == true && x.EntityIsShielded == true).Count();
+        var nearestOppHero = oppHeroes.OrderBy(x => x.DistanceToEnemyBase).FirstOrDefault();
+        if (!(nearestOppHero != null && Map.PointInCircle(myHeroes[Version], nearestOppHero.Position, RADIUS_WIND)))
+            nearestOppHero = null;
+
+        bool commanded = false;
+
+        Console.Error.WriteLine($"INFO: OFFENSE count = {targetOffense[0].Count}");
+
+        if (targetOffense[Version].Count == 0) Entity.move(Map.posOffenseMiddle);
+        else if (myHeroes[0].EnemyControllsEntity == true && myHeroes[0].EntityIsShielded == false)
+            Entity.shield(myHeroes[0]);
+        else
+        {
+            if (Entity.countingRounds > 10) Entity.countingShielded = 0;
+
+            if (Entity.countingShielded > 1 && nearestOppHero != null)
+            {
+                Console.Error.WriteLine("OFFENSE: There are more than 1 correct");
+                Entity.control(nearestOppHero.Id, Map.HomeBase);
+                commanded = true;
+            }
+            else if (Entity.countingShielded > 2)
+                Entity.move(myMath.calculateCorrectPositionFrom(Map.HomeBase, new Vector2(14500, 6000)));
+            else
+            {
+                foreach (var spider in targetOffense[Version])
+                {
+                    if (spider.DirectionEnemyBase == false && spider.EntityIsShielded == false)
+                    {
+                        Console.Error.WriteLine($"OFFENSE {Version}: Controlling {spider.Id}");
+                        Entity.control(spider.Id, Map.EnemyBase);
+                        commanded = true;
+                        break;
+                    }
+                    if (spider.EntityIsShielded == false && Map.shielding)
+                    {
+
+                        Console.Error.WriteLine($"OFFENSE {Version}: Shielding {spider.Id}");
+                        Entity.shield(spider);
+                        commanded = true;
+                        Map.shielding = false;
+                        break;
+                    }
+                    if (spider.EntityIsShielded == false && !Map.shielding)
+                    {
+                        Console.Error.WriteLine($"OFFENSE {Version}: Winding {spider.Id}");
+                        if (Map.PointInCircle(myHeroes[Version], spider.Position, 800))
+                            Entity.wind(Map.EnemyBase);
+                        else
+                        {
+                            nearestOppHero = oppHeroes.OrderBy(x => x.DistanceToEnemyBase).FirstOrDefault();
+                            if (nearestOppHero != null)
+                                Entity.control(nearestOppHero.Id, Map.HomeBase);
+                            else
+                                Entity.move(spider.Position);
+                        }
+                        commanded = true;
+                        Map.shielding = true;
+                        break;
+                    }
+                    if (Map.PointInCircle(spider, myHeroes[Version].Position, 200) == true)
+                    {
+                        Console.Error.WriteLine($"OFFENSE {Version}: Waiting because of {spider.Id}");
+                        nearestOppHero = oppHeroes.OrderByDescending(x => x.DistanceToEnemyBase).FirstOrDefault();
+                        if (nearestOppHero != null)
+                            Entity.control(nearestOppHero.Id, Map.HomeBase);
+                        else
+                            Entity.move(Map.posOffenseMiddle);
+                        commanded = true;
+                        break;
+                    }
+
+                }
+                if (commanded == false)
+                {
+                    Console.Error.WriteLine($"OFFENSE {Version}: Moving to Offense");
+                    nearestOppHero = oppHeroes.OrderByDescending(x => x.DistanceToEnemyBase).FirstOrDefault();
+                    if (nearestOppHero != null)
+                        Entity.control(nearestOppHero.Id, Map.HomeBase);
+                    else
+                        Entity.move(Map.posOffenseMiddle);
+                }
+            }
+        }
+        
+//    if (Entity.enemyShieldsSpider)
+        //    {
+        //        if (targetDefense.Count == 0) Entity.move(Map.posMiddleMiddle);
+        //        else
+        //        {
+        //            Console.Error.WriteLine($"DEFENSE99: Targeting {targetDefense[0].Id}");
+        //            var windInRange = Map.PointInCircle(myHeroes[i], targetDefense[0].Position, Entity.RADIUS_WIND);
+        //            if (targetDefense[0].DistanceToBase < 3000 && windInRange)
+        //                Entity.wind(myHeroes[1].Position); //Entity.wind(targetDefense[0].Position);
+        //            else
+        //            {
+        //                if (myHeroes[i].IsControlled == 1 || (Entity.enemyControllsHero == true && myHeroes[i].ShieldLife <= 0))
+        //                {
+        //                    Entity.shield(myHeroes[i]);
+        //                    Entity.enemyControllsHero = true;
+        //                }
+        //                else
+        //                    Entity.move(targetDefense[0].Position);
+
+
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (myMana > 150)
+        //        {
+        //            if (myHeroes[i].Position != Map.posOffenseMiddle)
+        //                Entity.move(Map.posOffenseMiddle);
+        //            else
+        //            {
+        //                var targetAttack = monsters.Where(x => x.DistanceToEnemyBase <= 6000).ToList();
+        //                if (targetAttack.Count > 0)
+        //                {
+        //                    var whatToDo = myMath.rand.Next(2);
+        //                    switch (whatToDo)
+        //                    {
+        //                        case 0:
+        //                            Entity.control(targetAttack[0].Id, Map.EnemyBase);
+        //                            break;
+        //                        case 1:
+        //                            var nearestToBase = oppHeroes.Where(x => Map.PointInCircle(myHeroes[i], x.Position, Entity.RADIUS_WIND) == true).OrderBy(i => i.DistanceToEnemyBase).ToList();
+        //                            if (nearestToBase.Count > 0)
+        //                                Entity.control(oppHeroes[0].Id, Map.HomeBase);
+        //                            else
+        //                                Entity.shield(targetAttack[0]);
+
+        //                            break;
+
+        //                    }
+        //                    if (whatToDo == 0)
+        //                        Entity.control(targetAttack[0].Id, Map.EnemyBase);
+
+        //                }
+        //                else
+        //                    Entity.move(Map.posOffenseMiddle);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            Console.Error.WriteLine($"OFFENSE: targeting {targetOffense[0].Id}");
+        //            Entity.move(targetOffense[0].Position);
+        //        }
+        //    }
+        //}
+
+
+
+    }
+
+    private static void wait()
+    {
+        Console.WriteLine("WAIT");
+    }
+}
