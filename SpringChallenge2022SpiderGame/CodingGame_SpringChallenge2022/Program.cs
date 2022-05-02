@@ -65,7 +65,7 @@ class Player
         {
             Map.countingRounds++;
             
-            Console.Error.WriteLine($"--->> ROUND {Map.countingRounds}");
+           // Console.Error.WriteLine($"--->> ROUND {Map.countingRounds}");
             #region StartWhile
             inputs = Console.ReadLine().Split(' ');
             int myHealth = int.Parse(inputs[0]); // Your base health
@@ -131,7 +131,7 @@ class Player
                         var tempPosition = monsters[monsters.Count - 1].Position;
                         var tempTrajDirection = new Vector2(vx,vy);
                         var tempDistance = Vector2.Distance(Map.HomeBase, tempPosition);
-                        Console.Error.WriteLine($" ================>> {entity.Id} -> Thread # {entity.ThreatFor} (1 = me, 2=enemy, 0=nothing)");
+                       // Console.Error.WriteLine($" ================>> {entity.Id} -> Thread # {entity.ThreatFor} (1 = me, 2=enemy, 0=nothing)");
 
                         for (int ji = 0; ji < 20; ji++)
                         {
@@ -143,21 +143,21 @@ class Player
                             {
                                 if (tempFutureDistance < 6500)
                                 {
-                                    Console.Error.WriteLine($" ================>> {entity.Id} was {entity.ThreatFor} is ThreadFor 1 now");
+                                   // Console.Error.WriteLine($" ================>> {entity.Id} was {entity.ThreatFor} is ThreadFor 1 now");
                                     entity.ThreatFor = 1;
                                     break;
                                 }
                             }
                             else
                             {
-                                Console.Error.WriteLine($" ================>> FutureDistance getting farer away");
+                               // Console.Error.WriteLine($" ================>> FutureDistance getting farer away");
                                 break;
                             }
 
                             tempPosition = tempFuturePosition;
                         }
 
-                        Console.Error.WriteLine($" ================>> finished with {entity.Id}\n");
+                       // Console.Error.WriteLine($" ================>> finished with {entity.Id}\n");
 
 
 
@@ -237,15 +237,15 @@ class Player
             }
             foreach (var spider in myHeroes[0].targetSpidersDefenseOne)
             {
-                Console.Error.WriteLine($"INFO 001 D1: found {spider.Id} - Thread {spider.ThreatFor}");
+               // Console.Error.WriteLine($"INFO 001 D1: found {spider.Id} - Thread {spider.ThreatFor}");
             }
             foreach (var spider in myHeroes[0].targetSpidersDefenseTwo)
             {
-                Console.Error.WriteLine($"INFO 001 D2: found {spider.Id} - Thread {spider.ThreatFor}");
+               // Console.Error.WriteLine($"INFO 001 D2: found {spider.Id} - Thread {spider.ThreatFor}");
             }
             foreach (var spider in myHeroes[0].targetSpidersDefenseThree)
             {
-                Console.Error.WriteLine($"INFO 001 D3: found {spider.Id} - Thread {spider.ThreatFor}");
+               // Console.Error.WriteLine($"INFO 001 D3: found {spider.Id} - Thread {spider.ThreatFor}");
             }
 
             #endregion
@@ -281,7 +281,7 @@ class Player
 
             for (int i = 0; i < heroesPerPlayer; i++)
             {
-                if ((myMana < 250 && Map.countingRounds < 150) && Map.goOffense == false )
+                if ((myMana < 300) && Map.goOffense == false )
                 {
                     Map.goOffense = false;
                     switch (i)
@@ -304,7 +304,7 @@ class Player
                     Map.setPosDefensesAllLeft();
                     Map.setPosDefensesAllRight();
                     Map.setPosDefenses2();
-                    Console.Error.WriteLine("---------------------------->> GO OFFENSE");
+                   // Console.Error.WriteLine("---------------------------->> GO OFFENSE");
 
                     switch (i)
                     {
@@ -330,7 +330,7 @@ class Player
 }
 
 
-public class    Entity
+public class        Entity
 {
     public int Id;
     public int Type;
@@ -455,39 +455,57 @@ public class    Entity
 
 
         Console.Error.WriteLine($" ===============> MANA <========== {myHeroes[2].mana}");
-        if (myHeroes[2].mana < 50)
+        if (myHeroes[2].mana < 120)
         {
             foreach (var spider in monsters)
             {
                 
-                if (Map.PointInCircle(myHeroes[2], spider, RADIUS_CONTROL) && spider.DistanceToBase < 6000)
+                if (Map.PointInCircle(myHeroes[2], spider, RADIUS_CONTROL) && spider.DistanceToEnemyBase < 7500 && spider.DistanceToEnemyBase > 6000) 
                 {
-                    Entity.move(spider.Position);
+                    //Entity.move(spider.Position);
+                    Entity.control(spider.Id, Map.EnemyBase);
                     return;
                 }
             }
 
 
-            Console.Error.WriteLine($" ===============> MANA <========== GOING BACK");
+            Console.Error.WriteLine($" ===============> MANA <========== No Control");
             
-            var helping = oppHeroes.Where(x => x.DistanceToEnemyBase < 5000).OrderBy(x => x.DistanceToEnemyBase).ToList();
+
+            foreach (var spider in monsters)
+            {
+                if (oppHeroes.Where(x => x.ShieldLife > 0).Count() > 0 && myHeroes[2].enoughMana)
+                {
+                    if (!spider.EntityIsShielded && spider.DistanceToEnemyBase < 5000)
+                    {
+                        Entity.shield(spider);
+                        return;
+                    }
+                }
+
+                Console.Error.WriteLine($" ===============> MANA <========== No Shield");
+                if (Map.PointInCircle(myHeroes[2], spider, RADIUS_WIND) && myHeroes[2].enoughMana)
+                {
+                    Entity.wind(Map.EnemyBase);
+                    return;
+                }
+
+                Console.Error.WriteLine($" ===============> MANA <========== No wind");
+                if (spider.DistanceToEnemyBase < 5000)
+                {
+                    Entity.move(spider.Position);
+                    return;
+                }
+                Console.Error.WriteLine($" ===============> MANA <========== No move spider");
+            }
+            var helping = oppHeroes.Where(x => x.DistanceToEnemyBase < 6500).OrderBy(x => x.DistanceToEnemyBase).ToList();
             if (helping.Count > 0)
             {
                 Entity.move(helping[0].Position);
                 return;
             }
-
-            foreach (var spider in monsters)
-            {
-                if (!spider.EntityIsShielded && spider.DistanceToEnemyBase < 4000)
-                {
-                    Entity.shield(spider);
-                    return;
-                }
-
-            }
-
-            Entity.move(new Vector2(1500,1500));
+            Console.Error.WriteLine($" ===============> MANA <========== No opp Hero moving");
+            Entity.move(Map.posOffenseMiddle);
             return;
         }
 
@@ -495,7 +513,7 @@ public class    Entity
         {
             if (!spider.EntityIsShielded && spider.Health > 15 && myHeroes[2].mana > 100)
             {
-                Console.Error.WriteLine($"OFFENSE --> SHIELDING {spider.Id}");
+               // Console.Error.WriteLine($"OFFENSE --> SHIELDING {spider.Id}");
                 Entity.shield(spider);
 
                 return;
@@ -512,7 +530,7 @@ public class    Entity
             }
             //if (!spider.EntityIsShielded && Map.PointInCircle(myHeroes[2], spider, RADIUS_WIND) && myHeroes[2].mana > 9)
         //    {
-        //        Console.Error.WriteLine($"OFFENSE --> Winding {spider.Id}");
+        //       // Console.Error.WriteLine($"OFFENSE --> Winding {spider.Id}");
         //        Entity.wind(Map.EnemyBase);
 
                 //        return;
@@ -527,7 +545,7 @@ public class    Entity
         //{
         //    if (!spider.EntityIsShielded && Map.PointInCircle(myHeroes[2], spider, RADIUS_WIND) && myHeroes[2].mana > 9)
         //    {
-        //        Console.Error.WriteLine($"OFFENSE --> Winding {spider.Id}");
+        //       // Console.Error.WriteLine($"OFFENSE --> Winding {spider.Id}");
         //        Entity.wind(Map.EnemyBase);
 
         //        return;
@@ -554,7 +572,7 @@ public class    Entity
 
         //foreach (var nearestOp in nearestOppHero)
         //{
-        //    Console.Error.WriteLine($"OFFENSE INFO 001: Found {nearestOp.Id}");
+        //   // Console.Error.WriteLine($"OFFENSE INFO 001: Found {nearestOp.Id}");
         //}
 
         ////if (nearestOppHero.Count > 0)
@@ -563,12 +581,12 @@ public class    Entity
         ////    foreach (var opHero in nearestOppHero)
         ////    {
 
-        ////        Console.Error.WriteLine($"OFFENSE INFO 002: Checking {opHero.Id} - Hero #{myHeroes[0]}");
+        ////       // Console.Error.WriteLine($"OFFENSE INFO 002: Checking {opHero.Id} - Hero #{myHeroes[0]}");
         ////        if (Map.PointInCircle(myHeroes[0], opHero, RADIUS_CONTROL))
         ////        {
 
         ////            nearestOppHero.Add(opHero);
-        ////            Console.Error.WriteLine($"OFFENSE INFO 003: Adding OppHero {opHero.Id}");
+        ////           // Console.Error.WriteLine($"OFFENSE INFO 003: Adding OppHero {opHero.Id}");
         ////            break;
         ////        }
         ////    }
@@ -576,7 +594,7 @@ public class    Entity
 
         ////foreach (var nearestOp in nearestOppHero)
         ////{
-        ////    Console.Error.WriteLine($"OFFENSE INFO 004: Found {nearestOp.Id}");
+        ////   // Console.Error.WriteLine($"OFFENSE INFO 004: Found {nearestOp.Id}");
         ////}
         ////if (!
         ////    (nearestOppHero != null && Map.PointInCircle(myHeroes[Version], nearestOppHero.Position, RADIUS_WIND)))
@@ -609,10 +627,10 @@ public class    Entity
         //{
         //    // if (Map.countingRounds % 20 == 0) Map.countingShielded = 0;
 
-        //    Console.Error.WriteLine($"------------> 006 counting Shielded {Map.countingShielded}");
+        //   // Console.Error.WriteLine($"------------> 006 counting Shielded {Map.countingShielded}");
         //    if (Map.countingShielded > 1 && nearestOppHero.Count > 0)// && nearestOppHero[0].EntityIsShielded == false)
         //    {
-        //        Console.Error.WriteLine("OFFENSE 007: There are more than 1 correct");
+        //       // Console.Error.WriteLine("OFFENSE 007: There are more than 1 correct");
         //        Entity.control(nearestOppHero[0].Id, Map.HomeBase);
         //        commanded = true;
         //    }
@@ -626,7 +644,7 @@ public class    Entity
         //        {
         //            if (spider.DirectionEnemyBase == false && spider.EntityIsShielded == false)
         //            {
-        //                Console.Error.WriteLine($"OFFENSE {Version} 008: Controlling {spider.Id}");
+        //               // Console.Error.WriteLine($"OFFENSE {Version} 008: Controlling {spider.Id}");
         //                Entity.control(spider.Id, Map.EnemyBase);
         //                commanded = true;
         //                break;
@@ -634,10 +652,10 @@ public class    Entity
         //            if (spider.EntityIsShielded == false && Map.shielding)
         //            {
 
-        //                Console.Error.WriteLine($"OFFENSE {Version} 009: Shielding {spider.Id}");
+        //               // Console.Error.WriteLine($"OFFENSE {Version} 009: Shielding {spider.Id}");
         //                Entity.shield(spider);
         //                Map.countingShielded++;
-        //                Console.Error.WriteLine($"OFFENSE INFO 010: Shields up {Map.countingShielded}");
+        //               // Console.Error.WriteLine($"OFFENSE INFO 010: Shields up {Map.countingShielded}");
         //                commanded = true;
         //                Map.shielding = true; //false
         //                break;
@@ -670,7 +688,7 @@ public class    Entity
         //            //}
         //            if (Map.PointInCircle(spider, myHeroes[Version], RADIUS_CONTROL) == true)
         //            {
-        //                Console.Error.WriteLine($"OFFENSE {Version} 011: Waiting because of {spider.Id}");
+        //               // Console.Error.WriteLine($"OFFENSE {Version} 011: Waiting because of {spider.Id}");
         //                //nearestOppHero = oppHeroes.OrderByDescending(x => x.DistanceToEnemyBase).FirstOrDefault();
         //                if (nearestOppHero.Count > 0) // && !spider.DirectionEnemyBase)
         //                    Entity.control(nearestOppHero[0].Id, Map.HomeBase);
@@ -683,7 +701,7 @@ public class    Entity
         //        }
         //        if (commanded == false)
         //        {
-        //            Console.Error.WriteLine($"OFFENSE {Version} 012: Moving to Offense????????????");
+        //           // Console.Error.WriteLine($"OFFENSE {Version} 012: Moving to Offense????????????");
         //            //nearestOppHero = oppHeroes.OrderByDescending(x => x.DistanceToEnemyBase).FirstOrDefault();
         //            if (nearestOppHero.Count > 0)
         //                Entity.control(nearestOppHero[0].Id, Map.HomeBase);
@@ -695,7 +713,7 @@ public class    Entity
         //                //}
         //                //else if (myHeroes[0].DistanceToEnemyBase > 7000)
         //                //{
-        //                //    Console.Error.WriteLine("OFFENSE: Moving back because nothing to do");
+        //                //   // Console.Error.WriteLine("OFFENSE: Moving back because nothing to do");
         //                //    Map.setPosOffense2();
         //                //}
 
@@ -713,7 +731,7 @@ public class    Entity
 
         if (action_ID == 3)
         {
-            Console.Error.WriteLine("------------------->>>> ACTION 3");
+           // Console.Error.WriteLine("------------------->>>> ACTION 3");
 
 
             
@@ -727,11 +745,9 @@ public class    Entity
             } 
             else
             {
-                Heroes[hero_ID].targetSpidersDefenseOne = Heroes[hero_ID].targetSpidersDefenseAll.Where(x => x.DistanceToBase < 6000 &&
-                    !myMath.checkAboveLine(Map.HomeBase, Map.seperateMiddleLine, x.Position)).ToList();
+                Heroes[hero_ID].targetSpidersDefenseOne = Heroes[hero_ID].targetSpidersDefenseAll.Where(x => x.DistanceToBase < 6000).ToList(); // !myMath.checkAboveLine(Map.HomeBase, Map.seperateMiddleLine, x.Position))
 
-                Heroes[hero_ID].targetSpidersDefenseTwo = Heroes[hero_ID].targetSpidersDefenseAll.Where(x => x.DistanceToBase < 6000 &&
-                    myMath.checkAboveLine(Map.HomeBase, Map.seperateMiddleLine, x.Position)).ToList();
+                Heroes[hero_ID].targetSpidersDefenseTwo = Heroes[hero_ID].targetSpidersDefenseAll.Where(x => x.DistanceToBase < 6000).ToList(); //                    myMath.checkAboveLine(Map.HomeBase, Map.seperateMiddleLine, x.Position)).ToList();
 
                     
                 
@@ -768,7 +784,7 @@ public class    Entity
         //if (warningControlled && !Heroes[hero_ID].EntityIsShielded && Heroes[hero_ID].enoughMana)
         //{
         //    Entity.shield(Heroes[hero_ID]);
-        //    if (Player.DebugDefense == true) Console.Error.WriteLine($"DEFENSE 001: SHIELDS UP HERO {hero_ID}!!");
+        //    if (Player.DebugDefense == true)// Console.Error.WriteLine($"DEFENSE 001: SHIELDS UP HERO {hero_ID}!!");
         //    return;
         //}
 
@@ -790,13 +806,13 @@ public class    Entity
                     if ((hero_ID == 0 && targetDefenseOppHeroAbove) || (hero_ID == 1 && targetDefenseOppHeroBelow) || (hero_ID == 2) || targetSpidersDefenseBaseAlarm)
                     {
                         Entity.wind(myMath.multiplyVectorByScalar(spider.Position));
-                        if (Player.DebugDefense == true) Console.Error.WriteLine($"DEFENSE 003: Hero {hero_ID} winds Spider {Heroes[hero_ID].targetSpiderIsInWindRadius[0].Id}");
+                        if (Player.DebugDefense == true)  Console.Error.WriteLine($"DEFENSE 003: Hero {hero_ID} winds Spider {Heroes[hero_ID].targetSpiderIsInWindRadius[0].Id}");
                         return;
                     }
 
                 }
             }
-            if (Player.DebugDefense == true) Console.Error.WriteLine($"DEFENSE 004: Hero {hero_ID} ->  No Spiders for wind");
+            if (Player.DebugDefense == true)  Console.Error.WriteLine($"DEFENSE 004: Hero {hero_ID} ->  No Spiders for wind");
         }
 
         // do something with the enemy in my base
@@ -804,14 +820,14 @@ public class    Entity
             Map.PointInCircle(Heroes[2], Heroes[hero_ID].targetDefenseOppHero[0], RADIUS_WIND) && hero_ID == 2) //targetSpidersDefenseBaseAlarm && 
         {
 
-            if (Player.DebugDefense == true) Console.Error.WriteLine($"DEFENSE 002: Coming for Help");
+            if (Player.DebugDefense == true)// Console.Error.WriteLine($"DEFENSE 002: Coming for Help");
             Entity.wind(Map.EnemyBase);
             return;
         }
         else if (targetSpidersDefenseBaseAlarm && targetDefenseOppHeroIsNotShielded && targetDefenseOppHero && Heroes[2].enoughMana &&
             !Map.PointInCircle(Heroes[2], Heroes[hero_ID].targetDefenseOppHero[0], RADIUS_CONTROL) && hero_ID == 2)
         {
-            if (Player.DebugDefense == true) Console.Error.WriteLine($"DEFENSE 002: Running for Help");
+            if (Player.DebugDefense == true)// Console.Error.WriteLine($"DEFENSE 002: Running for Help");
             Entity.move(Heroes[hero_ID].targetDefenseOppHero[0].Position);
             return;
         }
@@ -822,7 +838,7 @@ public class    Entity
         {
             foreach (var spider in Heroes[hero_ID].targetSpiderIsInControllRadius)
             {
-                if (Player.DebugDefense == true) Console.Error.WriteLine($"DEFENSE 003: Hero {hero_ID} could control Spider {Heroes[hero_ID].targetSpiderIsInControllRadius[0].Id}");
+                if (Player.DebugDefense == true)// Console.Error.WriteLine($"DEFENSE 003: Hero {hero_ID} could control Spider {Heroes[hero_ID].targetSpiderIsInControllRadius[0].Id}");
                 if (!spider.EntityIsShielded  && spider.Health > Player.HealthMaxDevided[spider.Id] && Player.gotControlled[spider.Id] == false && action_ID == 3 && spider.DistanceToBase > 5500) //spider.DistanceToBase > 5500 && spider.DistanceToBase < tempControlSpider
                 {
                     if ((hero_ID == 0 && targetDefenseOppHeroAbove) || (hero_ID == 1 && targetDefenseOppHeroBelow) || (hero_ID == 2) || targetSpidersDefenseBaseAlarm)
@@ -834,7 +850,7 @@ public class    Entity
                     
                 }
             }
-            if (Player.DebugDefense == true) Console.Error.WriteLine($"DEFENSE 004: Hero {hero_ID} -> No Spiders for control");
+            if (Player.DebugDefense == true)  Console.Error.WriteLine($"DEFENSE 004: Hero {hero_ID} -> No Spiders for control");
         }
 
 
@@ -855,11 +871,11 @@ public class    Entity
             case 0: //ACTION_DEFENSE_LEFT
                 if (targetSpidersDefenseOne)
                 {
-                    if (Player.DebugDefense == true) Console.Error.WriteLine($"DEFENSE 005: Hero: {hero_ID}, Defense One: Spiders found");
+                    if (Player.DebugDefense == true)// Console.Error.WriteLine($"DEFENSE 005: Hero: {hero_ID}, Defense One: Spiders found");
                     if (Player.DebugDefense == true)
-                        foreach (var spider in Heroes[hero_ID].targetSpidersDefenseOne.OrderByDescending(x => x.ThreatFor == 1))
+                        foreach (var spider in Heroes[hero_ID].targetSpidersDefenseOne.OrderBy(x => x.DistanceToBase).ThenByDescending(x => x.ThreatFor == 1))
                         {
-                            Console.Error.WriteLine($"DEFENSE 006: Hero: {hero_ID} -> Targets {spider.Id}");
+                           // Console.Error.WriteLine($"DEFENSE 006: Hero: {hero_ID} -> Targets {spider.Id}");
                         }
 
                     Entity.move(Heroes[hero_ID].targetSpidersDefenseOne[0].Position);
@@ -869,11 +885,11 @@ public class    Entity
             case 1: //ACTION_DEFENSE_RIGHTheri
                 if (targetSpidersDefenseTwo)
                 {
-                    if (Player.DebugDefense == true) Console.Error.WriteLine($"DEFENSE 007: Hero: {hero_ID}, Defense Two: Spiders found");
+                    if (Player.DebugDefense == true)// Console.Error.WriteLine($"DEFENSE 007: Hero: {hero_ID}, Defense Two: Spiders found");
                     if (Player.DebugDefense == true)
-                        foreach (var spider in Heroes[hero_ID].targetSpidersDefenseTwo.OrderByDescending(x => x.ThreatFor == 1))
+                        foreach (var spider in Heroes[hero_ID].targetSpidersDefenseTwo.OrderBy(x => x.DistanceToBase).ThenByDescending(x => x.ThreatFor == 1))
                         {
-                            Console.Error.WriteLine($"DEFENSE 008: Hero: {hero_ID} -> Targets {spider.Id}");
+                           // Console.Error.WriteLine($"DEFENSE 008: Hero: {hero_ID} -> Targets {spider.Id}");
                             Entity.move(Heroes[hero_ID].targetSpidersDefenseTwo[0].Position);
                             return;
                         }
@@ -883,12 +899,12 @@ public class    Entity
                 //if (Map.countingRounds > 70 && (targetSpidersDefenseBaseAlarm))
                 //{
                 //    if (Player.DebugDefense == true) 
-                //        Console.Error.WriteLine($"DEFENSE 007: Hero: {hero_ID}, Defense Two: Spiders found");
+                //       // Console.Error.WriteLine($"DEFENSE 007: Hero: {hero_ID}, Defense Two: Spiders found");
 
                 //    if (Player.DebugDefense == true)
                 //        foreach (var spider in Heroes[hero_ID].targetSpidersDefenseBaseAlarm.OrderByDescending(x => x.ThreatFor == 1))
                 //        {
-                //            Console.Error.WriteLine($"DEFENSE 008: Hero: {hero_ID} -> Targets {spider.Id}");
+                //           // Console.Error.WriteLine($"DEFENSE 008: Hero: {hero_ID} -> Targets {spider.Id}");
                 //        }
                 //    Entity.move(Heroes[hero_ID].targetSpidersDefenseBaseAlarm[0].Position);
                 //    return;
@@ -898,11 +914,11 @@ public class    Entity
 
                 if (targetSpidersDefenseThree)
                 {
-                    if (Player.DebugDefense == true) Console.Error.WriteLine($"DEFENSE 009: Hero: {hero_ID}, Defense Two: Spiders found");
+                    if (Player.DebugDefense == true)// Console.Error.WriteLine($"DEFENSE 009: Hero: {hero_ID}, Defense Two: Spiders found");
                     if (Player.DebugDefense == true)
-                        foreach (var spider in Heroes[hero_ID].targetSpidersDefenseThree.OrderByDescending(x => x.ThreatFor == 1))
+                        foreach (var spider in Heroes[hero_ID].targetSpidersDefenseThree.OrderBy(x => x.DistanceToBase).ThenByDescending(x => x.ThreatFor == 1))
                         {
-                            Console.Error.WriteLine($"DEFENSE 010: Hero: {hero_ID} -> Targets {spider.Id}");
+                           // Console.Error.WriteLine($"DEFENSE 010: Hero: {hero_ID} -> Targets {spider.Id}");
                             Entity.move(spider.Position);
                             return;
                         }
@@ -914,7 +930,7 @@ public class    Entity
         //// if no targets in my base -> move to defaultpos
         //if (!targetSpidersAll)
         //{
-        if (Player.DebugDefense == true) Console.Error.WriteLine($"DEFENSE 002: No Targets, Hero {hero_ID} moving to Pos {action_ID}");
+        if (Player.DebugDefense == true)// Console.Error.WriteLine($"DEFENSE 002: No Targets, Hero {hero_ID} moving to Pos {action_ID}");
         Entity.move(Map.posDefense[hero_ID]);
         return;
         //}
@@ -991,7 +1007,7 @@ internal class Map
 
     internal static void setPosOffense()
     {
-        posOffenseMiddle = myMath.calculateCorrectPositionFrom(HomeBase, new Vector2(16000, 6600));
+        posOffenseMiddle = myMath.calculateCorrectPositionFrom(HomeBase, new Vector2(14500, 6500));
     }
 
     internal static void setPosOffense2()
@@ -1090,7 +1106,7 @@ internal class myMath
         else
             vector1 = Vector2.Subtract(Entity, Map.HomeBase);
 
-        Console.Error.WriteLine($"--------->> Vector for Scalar is now {vector1.X} : {vector1.Y}");
+       // Console.Error.WriteLine($"--------->> Vector for Scalar is now {vector1.X} : {vector1.Y}");
         float scalar1 = 10f;
         
 
